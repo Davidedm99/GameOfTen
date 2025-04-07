@@ -34,7 +34,8 @@ jobs:
         run: npm run build
 
       - name: Add 404 fallback
-        run: cp dist/index.html dist/404.html
+        run: |
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/GameOfTen/"></head><body></body></html>' > dist/404.html
         
       - name: Setup Pages
         uses: actions/configure-pages@v3
