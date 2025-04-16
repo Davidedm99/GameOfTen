@@ -3,7 +3,7 @@ import NumberSlot from "./NumberSlot";
 import GameStatus from "./GameStatus";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, RefreshCcw } from "lucide-react";
 
 const MAX_NUMBER = 100;
 const MIN_NUMBER = 1;
@@ -32,7 +32,7 @@ const Game: React.FC = () => {
   // Start the game
   useEffect(() => {
     generateNumber();
-  }, []);
+  }, [usedNumbers]);
 
   // Check if player has won
   useEffect(() => {
@@ -63,7 +63,7 @@ const Game: React.FC = () => {
       setScore(score + 1);
 
       // Generate next number
-      generateNumber();
+      //generateNumber();
 
       toast({
         description: `Number ${currentNumber} placed in slot ${position}`,
@@ -87,18 +87,25 @@ const Game: React.FC = () => {
   const isValidMove = (position: number, number: number) => {
     const index = position - 1;
 
-    // Check left neighbor (if exists)
-    const leftNeighborValid = index === 0 ||
-      placedNumbers[index - 1] === null ||
-      placedNumbers[index - 1]! < number;
+    // All numbers before must be less than current number
+    for (let i = 0; i < index; i++) {
+      const val = placedNumbers[i];
+      if (val !== null && val >= number) {
+        return false;
+      }
+    }
 
-    // Check right neighbor (if exists)
-    const rightNeighborValid = index === SLOTS - 1 ||
-      placedNumbers[index + 1] === null ||
-      placedNumbers[index + 1]! > number;
+    // All numbers after must be greater than current number
+    for (let i = index + 1; i < SLOTS; i++) {
+      const val = placedNumbers[i];
+      if (val !== null && val <= number) {
+        return false;
+      }
+    }
 
-    return leftNeighborValid && rightNeighborValid;
+    return true;
   };
+
 
   // Reset the game
   const resetGame = () => {
@@ -121,6 +128,12 @@ const Game: React.FC = () => {
       />
 
       <div className="my-8 p-6 bg-card rounded-lg shadow-sm">
+        <div>
+          <Button variant="outline" className="flex items-center gap-2" onClick={resetGame}>
+            <RefreshCcw className="h-4 w-4" />
+            <span className="hidden sm:inline">Restart</span>
+          </Button>
+        </div>
         {!gameOver && currentNumber !== null && (
           <div className="mb-6 flex flex-col items-center">
             <span className="text-sm font-medium text-muted-foreground mb-2">Current Number</span>
